@@ -1,0 +1,197 @@
+<div class="container-xxl">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container-xxl">
+      <div class="row align-items-center">
+        <div class="col-lg-6 hero-content">
+          <h1 class="display-5">Cook, Share, Inspire</h1>
+          <p class="lead">Join our vibrant community of food lovers. Discover recipes that bring joy to your table and memories to cherish.</p>
+          <div class="hero-buttons">
+            <a href="/explore-latest" class="btn btn-primary me-3">Start Cooking</a>
+            <a href="/explore-random" class="btn btn-outline">Surprise Me</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <img src="/img/hero-image.png" class="img-fluid" alt="Delicious Food">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="category-section">
+    <div class="container-xxl">
+      <div class="section-title">
+        <h2>What's Your Craving?</h2>
+        <p>Explore recipes by category and find your next favorite dish</p>
+      </div>
+      <div class="category-grid">
+        <% if(categories != '') { %>
+          <% categories.forEach(function(category, index) { %>
+            <a href="/categories/<%- category.name %>" class="category-item">
+              <div class="category-icon">
+                <img src="img/<%- category.image %>" alt="<%- category.name %>">
+              </div>
+              <h3><%- category.name %></h3>
+            </a>
+          <% }) %>
+        <% } %>
+        <a href="/categories" class="category-item">
+          <div class="category-icon">
+            <img src="img/view-all.jpg" alt="View All Categories">
+          </div>
+          <h3>Browse All</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest Recipes -->
+  <section class="featured-section">
+    <div class="container-xxl">
+      <div class="section-title">
+        <h2>Fresh & New</h2>
+        <p>The latest creations from our community</p>
+      </div>
+      <div class="row g-4">
+        <% if(food != '') { %>
+          <% food.latest.forEach(function(recipe, index){ %>
+            <div class="col-md-6 col-lg-4">
+              <div class="recipe-card">
+                <div class="recipe-image">
+                  <img src="/uploads/<%= recipe.image %>" alt="<%= recipe.name %>">
+                </div>
+                <div class="recipe-content">
+                  <h3 class="recipe-title"><%= recipe.name %></h3>
+                  <a href="/recipe/<%= recipe._id %>" class="btn btn-outline">View Recipe</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="col-12">
+            <p class="text-center">No recipes found</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cuisine Sections -->
+  <% const cuisines = [
+    { id: 'thai', name: 'Thai Kitchen', description: 'Authentic flavors of Thailand' },
+    { id: 'american', name: 'American Comfort', description: 'Classic American favorites' },
+    { id: 'chinese', name: 'Chinese Delights', description: 'Traditional Chinese cuisine' }
+  ] %>
+
+  <% cuisines.forEach(function(cuisine) { %>
+    <section class="featured-section">
+      <div class="container-xxl">
+        <div class="section-title">
+          <h2><%= cuisine.name %></h2>
+          <p><%= cuisine.description %></p>
+        </div>
+        <div class="row g-4">
+          <% if(food[cuisine.id] && food[cuisine.id].length > 0) { %>
+            <% food[cuisine.id].forEach(function(recipe, index){ %>
+              <div class="col-md-6 col-lg-4">
+                <div class="recipe-card">
+                  <div class="recipe-image">
+                    <img src="/uploads/<%= recipe.image %>" alt="<%= recipe.name %>">
+                  </div>
+                  <div class="recipe-content">
+                    <h3 class="recipe-title"><%= recipe.name %></h3>
+                    <a href="/recipe/<%= recipe._id %>" class="btn btn-outline">View Recipe</a>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="col-12">
+              <p class="text-center">No recipes found</p>
+            </div>
+          <% } %>
+        </div>
+        <div class="text-center mt-5">
+          <a href="/categories/<%= cuisine.name %>" class="btn btn-outline">Explore More <%= cuisine.name %></a>
+        </div>
+      </div>
+    </section>
+  <% }) %>
+
+  <!-- Submit Recipe Section -->
+  <section class="submit-section">
+    <div class="container-xxl">
+      <div class="submit-content">
+        <div class="row align-items-center">
+          <div class="col-lg-6 submit-left">
+            <div class="submit-text">
+              <h2>Got a Recipe to Share?</h2>
+              <p class="lead">Join thousands of food enthusiasts and share your culinary masterpieces with our growing community.</p>
+              <div class="features">
+                <div class="feature-item">
+                  <i class="fas fa-camera"></i>
+                  <span>Add beautiful photos</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-list"></i>
+                  <span>Easy-to-follow steps</span>
+                </div>
+                <div class="feature-item">
+                  <i class="fas fa-heart"></i>
+                  <span>Connect with food lovers</span>
+                </div>
+              </div>
+              <a href="/submit-recipe" class="btn btn-lg">Start Sharing Now</a>
+            </div>
+          </div>
+          <div class="col-lg-6 submit-right">
+            <div class="submit-image">
+              <img src="/img/publish-recipe.png" class="floating-image" alt="Share your recipe">
+              <div class="recipe-cards">
+                <div class="recipe-preview">
+                  <div class="recipe-preview-img"></div>
+                  <div class="recipe-preview-content">
+                    <div class="preview-line"></div>
+                    <div class="preview-line short"></div>
+                  </div>
+                </div>
+                <div class="recipe-preview">
+                  <div class="recipe-preview-img"></div>
+                  <div class="recipe-preview-content">
+                    <div class="preview-line"></div>
+                    <div class="preview-line short"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container-xxl">
+      <div class="row gy-4">
+        <div class="col-lg-4">
+          <h3>About Us</h3>
+          <p>We're building a community where passionate cooks share their favorite recipes and inspire others to create amazing dishes.</p>
+        </div>
+        <div class="col-lg-4">
+          <h3>Quick Links</h3>
+          <ul class="list-unstyled">
+            <li><a href="/explore-latest">Latest Recipes</a></li>
+            <li><a href="/categories">Recipe Categories</a></li>
+            <li><a href="/submit-recipe">Share Your Recipe</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-4">
+          <h3>Join Our Community</h3>
+          <p>Follow us for daily recipe inspiration, cooking tips, and updates from our community.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

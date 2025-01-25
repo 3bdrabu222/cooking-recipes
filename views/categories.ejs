@@ -1,0 +1,55 @@
+<div class="container-xxl py-5">
+  <!-- Header Section -->
+  <div class="section-title text-center mb-5">
+    <h1 class="display-5">Explore Categories</h1>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb justify-content-center">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/categories">Categories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Explore Categories</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="category-grid mb-5">
+    <% if(typeof categories !== 'undefined' && categories.length > 0) { %>
+      <% categories.forEach(function(category, index) { %>
+        <a href="/categories/<%- category.name %>" class="category-item">
+          <div class="category-icon">
+            <img src="/img/<%- category.image %>" alt="<%- category.name %>" loading="lazy">
+          </div>
+          <h3><%- category.name %></h3>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+
+  <!-- Recipe Grid -->
+  <% if(typeof categoryById !== 'undefined' && categoryById.length > 0) { %>
+    <div class="section-title text-center mb-5">
+      <h2>Available Recipes</h2>
+      <p>Discover delicious recipes in this category</p>
+    </div>
+    
+    <div class="row g-4">
+      <% categoryById.forEach(function(recipe, index){ %>
+        <div class="col-md-6 col-lg-4">
+          <div class="recipe-card">
+            <div class="recipe-image">
+              <img src="/uploads/<%= recipe.image %>" alt="<%= recipe.name %>" loading="lazy">
+            </div>
+            <div class="recipe-content">
+              <h3 class="recipe-title"><%= recipe.name %></h3>
+              <a href="/recipe/<%= recipe._id %>" class="btn btn-outline">View Recipe</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else if(typeof categoryById !== 'undefined') { %>
+    <div class="text-center">
+      <p class="lead">No recipes found in this category.</p>
+    </div>
+  <% } %>
+</div>

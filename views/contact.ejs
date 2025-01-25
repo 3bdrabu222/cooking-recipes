@@ -1,0 +1,146 @@
+<div class="container-xxl py-5">
+  <!-- Hero Section -->
+  <section class="hero-section mb-5">
+    <div class="container-xxl">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center hero-content">
+          <h1 class="display-5">Get in Touch</h1>
+          <p class="lead">Have questions or suggestions? We'd love to hear from you. Reach out to us anytime.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Info Section -->
+  <section class="featured-section">
+    <div class="container-xxl">
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-5">
+          <div class="card h-100">
+            <div class="card-body text-center p-4">
+              <div class="feature-icon mb-4">
+                <i class="fas fa-envelope"></i>
+              </div>
+              <h3>Email Us</h3>
+              <p>alshrafi1999@gmail.com</p>
+              <p class="text-muted">We'll respond within 24 hours</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="card h-100">
+            <div class="card-body text-center p-4">
+              <div class="feature-icon mb-4">
+                <i class="fas fa-phone"></i>
+              </div>
+              <h3>Call Us</h3>
+              <p>+966 552445377</p>
+              <p class="text-muted">Mon-Fri, 9am-5pm EST</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Form Section -->
+  <section class="featured-section">
+    <div class="container-xxl">
+      <div class="section-title text-center mb-5">
+        <h2>Send Us a Message</h2>
+        <p>We'd love to hear from you</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-body p-4 p-md-5">
+              <form action="/contact" method="POST">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
+                      <label for="name">Your Name</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                      <label for="email">Your Email</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" id="subject" name="subject" placeholder="Subject" required>
+                      <label for="subject">Subject</label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-floating">
+                      <textarea class="form-control" id="message" name="message" placeholder="Message" style="height: 150px" required></textarea>
+                      <label for="message">Message</label>
+                    </div>
+                  </div>
+                  <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Send Message</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="featured-section">
+    <div class="container-xxl">
+      <div class="section-title text-center mb-5">
+        <h2>Frequently Asked Questions</h2>
+        <p>Quick answers to common questions</p>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                  How do I submit a recipe?
+                </button>
+              </h2>
+              <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Click on the "Share Recipe" button in the navigation menu. Fill out the recipe form with your ingredients, instructions, and photos. Once submitted, our team will review and publish your recipe.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                  Can I edit my submitted recipes?
+                </button>
+              </h2>
+              <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  Yes, you can edit your recipes after submission. Simply log into your account, go to your profile, and select the recipe you want to edit.
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                  How long does recipe approval take?
+                </button>
+              </h2>
+              <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                  We typically review and approve recipes within 24-48 hours. We'll notify you via email once your recipe is published.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
