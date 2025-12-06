@@ -1,0 +1,108 @@
+<div class="container-xxl">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Browse API Recipes</li>
+    </ol>
+  </nav>
+
+  <div class="row mb-5">
+    <div class="col-12">
+      <h1 class="display-4 mb-3">Browse Recipes from TheMealDB</h1>
+      <p class="lead">Discover thousands of recipes from around the world, powered by TheMealDB API</p>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row mb-5">
+    <div class="col-md-4 mb-3">
+      <div class="card h-100 text-center">
+        <div class="card-body">
+          <i class="bi bi-shuffle display-4 text-primary mb-3"></i>
+          <h5 class="card-title">Random Recipe</h5>
+          <p class="card-text">Get a random recipe to try something new!</p>
+          <a href="/api-recipes/random" class="btn btn-primary">Surprise Me</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card h-100 text-center">
+        <div class="card-body">
+          <i class="bi bi-search display-4 text-success mb-3"></i>
+          <h5 class="card-title">Search Recipes</h5>
+          <p class="card-text">Search for recipes by name</p>
+          <form method="GET" action="/api-recipes/search" class="mt-3">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control" placeholder="Search recipes..." required>
+              <button class="btn btn-success" type="submit">Search</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card h-100 text-center">
+        <div class="card-body">
+          <i class="bi bi-info-circle display-4 text-info mb-3"></i>
+          <h5 class="card-title">About TheMealDB</h5>
+          <p class="card-text">Free recipe API with no API key required</p>
+          <a href="https://www.themealdb.com" target="_blank" class="btn btn-info">Learn More</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="mb-4">Browse by Category</h2>
+      <div class="row g-3">
+        <% if(categories && categories.length > 0) { %>
+          <% categories.forEach(function(category) { %>
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100">
+                <img src="<%= category.strCategoryThumb %>" class="card-img-top" alt="<%= category.strCategory %>" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                  <h5 class="card-title"><%= category.strCategory %></h5>
+                  <p class="card-text"><%= category.strCategoryDescription ? category.strCategoryDescription.substring(0, 100) + '...' : '' %></p>
+                  <a href="/api-recipes/category/<%= category.strCategory %>" class="btn btn-outline-primary btn-sm">View Recipes</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="col-12">
+            <p class="text-center">No categories available</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Areas/Cuisines Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="mb-4">Browse by Cuisine/Area</h2>
+      <div class="row g-3">
+        <% if(areas && areas.length > 0) { %>
+          <% areas.forEach(function(area) { %>
+            <div class="col-md-3 col-sm-6">
+              <div class="card h-100 text-center">
+                <div class="card-body">
+                  <i class="bi bi-globe display-6 text-warning mb-3"></i>
+                  <h5 class="card-title"><%= area.strArea %></h5>
+                  <a href="/api-recipes/area/<%= area.strArea %>" class="btn btn-outline-warning btn-sm">View Recipes</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="col-12">
+            <p class="text-center">No areas available</p>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+

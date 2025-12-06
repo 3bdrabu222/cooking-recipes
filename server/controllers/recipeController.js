@@ -1,24 +1,72 @@
 require('../models/database');
-const Category = require('../models/Category');
-const Recipe = require('../models/Recipe');
-
+const mealDBService = require('../services/mealDBService');
 
 /**
  * GET /
- * Homepage 
+ * Homepage - Using TheMealDB API
 */
 exports.homepage = async(req, res) => {
   try {
     const limitNumber = 5;
-    const categories = await Category.find({}).limit(limitNumber);
-    const latest = await Recipe.find({}).sort({_id: -1}).limit(limitNumber);
-    const thai = await Recipe.find({ 'category': 'Thai' }).limit(limitNumber);
-    const american = await Recipe.find({ 'category': 'American' }).limit(limitNumber);
-    const chinese = await Recipe.find({ 'category': 'Chinese' }).limit(limitNumber);
+    
+    // Get categories from API
+    const apiCategories = await mealDBService.getAllCategories();
+    const categories = apiCategories.slice(0, limitNumber).map(cat => ({
+      name: cat.strCategory,
+      image: cat.strCategoryThumb
+    }));
+
+    // Get random recipes for different sections
+    const latest = [];
+    const thai = [];
+    const american = [];
+    const chinese = [];
+
+    // Get random recipes
+    for (let i = 0; i < limitNumber; i++) {
+      const randomRecipe = await mealDBService.getRandomRecipe();
+      if (randomRecipe) {
+        const recipe = mealDBService.convertMealDBToRecipe(randomRecipe);
+        latest.push(recipe);
+      }
+    }
+
+    // Get Thai recipes
+    const thaiRecipes = await mealDBService.getRecipesByCategory('Thai');
+    thaiRecipes.slice(0, limitNumber).forEach(meal => {
+      thai.push({
+        id: meal.idMeal,
+        name: meal.strMeal,
+        image: meal.strMealThumb,
+        mealDBId: meal.idMeal
+      });
+    });
+
+    // Get American recipes
+    const americanRecipes = await mealDBService.getRecipesByCategory('American');
+    americanRecipes.slice(0, limitNumber).forEach(meal => {
+      american.push({
+        id: meal.idMeal,
+        name: meal.strMeal,
+        image: meal.strMealThumb,
+        mealDBId: meal.idMeal
+      });
+    });
+
+    // Get Chinese recipes
+    const chineseRecipes = await mealDBService.getRecipesByCategory('Chinese');
+    chineseRecipes.slice(0, limitNumber).forEach(meal => {
+      chinese.push({
+        id: meal.idMeal,
+        name: meal.strMeal,
+        image: meal.strMealThumb,
+        mealDBId: meal.idMeal
+      });
+    });
 
     const food = { latest, thai, american, chinese };
 
-    res.render('index', { title: 'Cooking Blog - Home', categories, food } );
+    res.render('index', { title: 'Cooking Blog - Home', categories, food, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -26,13 +74,17 @@ exports.homepage = async(req, res) => {
 
 /**
  * GET /categories
- * Categories 
+ * Categories - Using TheMealDB API
 */
 exports.exploreCategories = async(req, res) => {
   try {
-    const limitNumber = 20;
-    const categories = await Category.find({}).limit(limitNumber);
-    res.render('categories', { title: 'Cooking Blog - Categories', categories } );
+    const apiCategories = await mealDBService.getAllCategories();
+    const categories = apiCategories.map(cat => ({
+      name: cat.strCategory,
+      image: cat.strCategoryThumb,
+      description: cat.strCategoryDescription
+    }));
+    res.render('categories', { title: 'Cooking Blog - Categories', categories, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -41,14 +93,19 @@ exports.exploreCategories = async(req, res) => {
 
 /**
  * GET /categories/:id
- * Categories By Id
+ * Categories By Id - Using TheMealDB API
 */
 exports.exploreCategoriesById = async(req, res) => { 
   try {
     let categoryId = req.params.id;
-    const limitNumber = 20;
-    const categoryById = await Recipe.find({ 'category': categoryId }).limit(limitNumber);
-    res.render('categories', { title: 'Cooking Blog - Categoreis', categoryById } );
+    const mealDBRecipes = await mealDBService.getRecipesByCategory(categoryId);
+    const categoryById = mealDBRecipes.map(meal => ({
+      id: meal.idMeal,
+      name: meal.strMeal,
+      image: meal.strMealThumb,
+      mealDBId: meal.idMeal
+    }));
+    res.render('categories', { title: `Cooking Blog - ${categoryId} Recipes`, categoryById, categoryName: categoryId, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -56,13 +113,18 @@ exports.exploreCategoriesById = async(req, res) => {
  
 /**
  * GET /recipe/:id
- * Recipe 
+ * Recipe - Using TheMealDB API
 */
 exports.exploreRecipe = async(req, res) => {
   try {
     let recipeId = req.params.id;
-    const recipe = await Recipe.findById(recipeId);
-    res.render('recipe', { title: 'Cooking Blog - Recipe', recipe } );
+    // Try to get from API first
+    const mealDBRecipe = await mealDBService.getRecipeById(recipeId);
+    if (mealDBRecipe) {
+      const recipe = mealDBService.convertMealDBToRecipe(mealDBRecipe);
+      return res.render('recipe', { title: `Cooking Blog - ${recipe.name}`, recipe, fromAPI: true } );
+    }
+    res.status(404).send({message: 'Recipe not found' });
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -71,13 +133,14 @@ exports.exploreRecipe = async(req, res) => {
 
 /**
  * POST /search
- * Search 
+ * Search - Using TheMealDB API
 */
 exports.searchRecipe = async(req, res) => {
   try {
     let searchTerm = req.body.searchTerm;
-    let recipe = await Recipe.find( { $text: { $search: searchTerm, $diacriticSensitive: true } });
-    res.render('search', { title: 'Cooking Blog - Search', recipe } );
+    const mealDBRecipes = await mealDBService.searchRecipesByName(searchTerm);
+    const recipes = mealDBRecipes.map(meal => mealDBService.convertMealDBToRecipe(meal));
+    res.render('search', { title: 'Cooking Blog - Search', recipe: recipes, searchTerm, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -86,13 +149,23 @@ exports.searchRecipe = async(req, res) => {
 
 /**
  * GET /explore-latest
- * Explpore Latest 
+ * Explore Latest - Using TheMealDB API (Random recipes)
 */
 exports.exploreLatest = async(req, res) => {
   try {
     const limitNumber = 20;
-    const recipe = await Recipe.find({}).sort({ _id: -1 }).limit(limitNumber);
-    res.render('explore-latest', { title: 'Cooking Blog - Explore Latest', recipe } );
+    const recipes = [];
+    
+    // Get random recipes
+    for (let i = 0; i < limitNumber; i++) {
+      const randomRecipe = await mealDBService.getRandomRecipe();
+      if (randomRecipe) {
+        const recipe = mealDBService.convertMealDBToRecipe(randomRecipe);
+        recipes.push(recipe);
+      }
+    }
+    
+    res.render('explore-latest', { title: 'Cooking Blog - Explore Latest', recipe: recipes, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -102,14 +175,16 @@ exports.exploreLatest = async(req, res) => {
 
 /**
  * GET /explore-random
- * Explore Random as JSON
+ * Explore Random - Using TheMealDB API
 */
 exports.exploreRandom = async(req, res) => {
   try {
-    let count = await Recipe.find().countDocuments();
-    let random = Math.floor(Math.random() * count);
-    let recipe = await Recipe.findOne().skip(random).exec();
-    res.render('explore-random', { title: 'Cooking Blog - Explore Latest', recipe } );
+    const mealDBRecipe = await mealDBService.getRandomRecipe();
+    if (!mealDBRecipe) {
+      return res.status(404).send({message: 'No recipe found'});
+    }
+    const recipe = mealDBService.convertMealDBToRecipe(mealDBRecipe);
+    res.render('explore-random', { title: `Cooking Blog - ${recipe.name}`, recipe, fromAPI: true } );
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occured" });
   }
@@ -118,58 +193,22 @@ exports.exploreRandom = async(req, res) => {
 
 /**
  * GET /submit-recipe
- * Submit Recipe
+ * Submit Recipe - Disabled, using API only
 */
 exports.submitRecipe = async(req, res) => {
-  const infoErrorsObj = req.flash('infoErrors');
-  const infoSubmitObj = req.flash('infoSubmit');
-  res.render('submit-recipe', { title: 'Cooking Blog - Submit Recipe', infoErrorsObj, infoSubmitObj  } );
+  res.render('submit-recipe', { 
+    title: 'Cooking Blog - Submit Recipe', 
+    apiOnly: true 
+  } );
 }
 
 /**
  * POST /submit-recipe
- * Submit Recipe
+ * Submit Recipe - Disabled, using API only
 */
 exports.submitRecipeOnPost = async(req, res) => {
-  try {
-
-    let imageUploadFile;
-    let uploadPath;
-    let newImageName;
-
-    if(!req.files || Object.keys(req.files).length === 0){
-      console.log('No Files where uploaded.');
-    } else {
-
-      imageUploadFile = req.files.image;
-      newImageName = Date.now() + imageUploadFile.name;
-
-      uploadPath = require('path').resolve('./') + '/public/uploads/' + newImageName;
-
-      imageUploadFile.mv(uploadPath, function(err){
-        if(err) return res.status(500).send(err);
-      })
-
-    }
-
-    const newRecipe = new Recipe({
-      name: req.body.name,
-      description: req.body.description,
-      email: req.body.email,
-      ingredients: req.body.ingredients,
-      category: req.body.category,
-      image: newImageName
-    });
-    
-    await newRecipe.save();
-
-    req.flash('infoSubmit', 'Recipe has been added.')
-    res.redirect('/submit-recipe');
-  } catch (error) {
-    // res.json(error);
-    req.flash('infoErrors', error);
-    res.redirect('/submit-recipe');
-  }
+  req.flash('infoErrors', 'Recipe submission is disabled. This site uses TheMealDB API only.');
+  res.redirect('/submit-recipe');
 }
 
 
@@ -312,5 +351,203 @@ exports.contactPost = async(req, res) => {
     res.redirect('/contact');
   } catch (error) {
     res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * TheMealDB API Controllers
+ * Note: mealDBService is already imported at the top
+ */
+
+/**
+ * GET /api-recipes
+ * Browse recipes from TheMealDB API
+ */
+exports.browseAPIRecipes = async(req, res) => {
+  try {
+    const categories = await mealDBService.getAllCategories();
+    const areas = await mealDBService.getAllAreas();
+    res.render('api-recipes', { 
+      title: 'Cooking Blog - Browse API Recipes', 
+      categories, 
+      areas 
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * GET /api-recipes/random
+ * Get random recipe from TheMealDB API
+ */
+exports.getRandomAPIRecipe = async(req, res) => {
+  try {
+    const mealDBRecipe = await mealDBService.getRandomRecipe();
+    if (!mealDBRecipe) {
+      return res.status(404).send({message: 'No recipe found'});
+    }
+    const recipe = mealDBService.convertMealDBToRecipe(mealDBRecipe);
+    res.render('api-recipe-detail', { 
+      title: `Cooking Blog - ${recipe.name}`, 
+      recipe,
+      fromAPI: true
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * GET /api-recipes/search
+ * Search recipes from TheMealDB API
+ */
+exports.searchAPIRecipes = async(req, res) => {
+  try {
+    const searchTerm = req.query.q || '';
+    let recipes = [];
+    
+    if (searchTerm) {
+      const mealDBRecipes = await mealDBService.searchRecipesByName(searchTerm);
+      recipes = mealDBRecipes.map(meal => mealDBService.convertMealDBToRecipe(meal));
+    }
+    
+    res.render('api-recipes-search', { 
+      title: 'Cooking Blog - Search API Recipes', 
+      recipes,
+      searchTerm
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * GET /api-recipes/category/:category
+ * Get recipes by category from TheMealDB API
+ */
+exports.getAPIRecipesByCategory = async(req, res) => {
+  try {
+    const category = req.params.category;
+    const mealDBRecipes = await mealDBService.getRecipesByCategory(category);
+    const recipes = mealDBRecipes.map(meal => {
+      // For filtered results, we only have basic info, need to fetch full details
+      return {
+        id: meal.idMeal,
+        name: meal.strMeal,
+        image: meal.strMealThumb
+      };
+    });
+    
+    res.render('api-recipes-category', { 
+      title: `Cooking Blog - ${category} Recipes`, 
+      recipes,
+      category
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * GET /api-recipes/area/:area
+ * Get recipes by area from TheMealDB API
+ */
+exports.getAPIRecipesByArea = async(req, res) => {
+  try {
+    const area = req.params.area;
+    const mealDBRecipes = await mealDBService.getRecipesByArea(area);
+    const recipes = mealDBRecipes.map(meal => {
+      return {
+        id: meal.idMeal,
+        name: meal.strMeal,
+        image: meal.strMealThumb
+      };
+    });
+    
+    res.render('api-recipes-area', { 
+      title: `Cooking Blog - ${area} Recipes`, 
+      recipes,
+      area
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * GET /api-recipes/detail/:id
+ * Get recipe details by ID from TheMealDB API
+ */
+exports.getAPIRecipeDetail = async(req, res) => {
+  try {
+    const recipeId = req.params.id;
+    const mealDBRecipe = await mealDBService.getRecipeById(recipeId);
+    
+    if (!mealDBRecipe) {
+      return res.status(404).send({message: 'Recipe not found'});
+    }
+    
+    const recipe = mealDBService.convertMealDBToRecipe(mealDBRecipe);
+    res.render('api-recipe-detail', { 
+      title: `Cooking Blog - ${recipe.name}`, 
+      recipe,
+      fromAPI: true
+    });
+  } catch (error) {
+    res.status(500).send({message: error.message || "Error Occurred" });
+  }
+}
+
+/**
+ * POST /api-recipes/import/:id
+ * Import recipe from TheMealDB API to local database
+ */
+exports.importAPIRecipe = async(req, res) => {
+  try {
+    const recipeId = req.params.id;
+    const mealDBRecipe = await mealDBService.getRecipeById(recipeId);
+    
+    if (!mealDBRecipe) {
+      req.flash('infoErrors', 'Recipe not found in API');
+      return res.redirect('/api-recipes');
+    }
+    
+    const recipeData = mealDBService.convertMealDBToRecipe(mealDBRecipe);
+    
+    // Check if recipe already exists
+    const existingRecipe = await Recipe.findOne({ 
+      $or: [
+        { name: recipeData.name },
+        { mealDBId: recipeData.mealDBId }
+      ]
+    });
+    
+    if (existingRecipe) {
+      req.flash('infoErrors', 'Recipe already exists in database');
+      return res.redirect(`/api-recipes/detail/${recipeId}`);
+    }
+    
+    // Create new recipe
+    const newRecipe = new Recipe({
+      name: recipeData.name,
+      description: recipeData.description.substring(0, 500), // Limit description length
+      email: recipeData.email,
+      ingredients: recipeData.ingredients,
+      category: recipeData.category,
+      image: recipeData.image,
+      mealDBId: recipeData.mealDBId,
+      area: recipeData.area,
+      tags: recipeData.tags,
+      youtube: recipeData.youtube,
+      source: recipeData.source
+    });
+    
+    await newRecipe.save();
+    req.flash('infoSubmit', 'Recipe imported successfully!');
+    res.redirect(`/recipe/${newRecipe._id}`);
+  } catch (error) {
+    req.flash('infoErrors', error.message || 'Error importing recipe');
+    res.redirect('/api-recipes');
   }
 }

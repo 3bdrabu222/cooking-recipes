@@ -1,0 +1,41 @@
+<div class="container-xxl">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/api-recipes">API Recipes</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><%= area %></li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 mb-3"><%= area %> Cuisine</h1>
+      <p class="lead">Explore authentic <%= area.toLowerCase() %> recipes from TheMealDB</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <% if(recipes && recipes.length > 0) { %>
+      <% recipes.forEach(function(recipe) { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <img src="<%= recipe.image %>" class="card-img-top" alt="<%= recipe.name %>" style="height: 250px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title"><%= recipe.name %></h5>
+              <a href="/api-recipes/detail/<%= recipe.id %>" class="btn btn-primary">View Recipe</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+          <h4>No recipes found for this area</h4>
+          <a href="/api-recipes" class="btn btn-primary">Browse All Areas</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+

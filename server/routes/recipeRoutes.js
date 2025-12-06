@@ -20,4 +20,13 @@ router.get('/about', recipeController.about);
 router.get('/contact', recipeController.contact);
 router.post('/contact', recipeController.contactPost);
 
+// TheMealDB API Routes
+router.get('/api-recipes', recipeController.browseAPIRecipes);
+router.get('/api-recipes/random', recipeController.getRandomAPIRecipe);
+router.get('/api-recipes/search', recipeController.searchAPIRecipes);
+router.get('/api-recipes/category/:category', recipeController.getAPIRecipesByCategory);
+router.get('/api-recipes/area/:area', recipeController.getAPIRecipesByArea);
+router.get('/api-recipes/detail/:id', recipeController.getAPIRecipeDetail);
+router.post('/api-recipes/import/:id', recipeController.importAPIRecipe);
+
 module.exports = router;

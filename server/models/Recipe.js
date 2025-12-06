@@ -26,6 +26,26 @@ const recipeSchema = new mongoose.Schema({
     type: String,
     required: 'This field is required.'
   },
+  mealDBId: {
+    type: String,
+    required: false
+  },
+  area: {
+    type: String,
+    required: false
+  },
+  tags: {
+    type: Array,
+    required: false
+  },
+  youtube: {
+    type: String,
+    required: false
+  },
+  source: {
+    type: String,
+    required: false
+  }
 });
 
 recipeSchema.index({ name: 'text', description: 'text' });

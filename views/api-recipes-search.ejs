@@ -1,0 +1,58 @@
+<div class="container-xxl">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/api-recipes">API Recipes</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Search Results</li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 mb-3">Search Results</h1>
+      <% if(searchTerm) { %>
+        <p class="lead">Results for: "<strong><%= searchTerm %></strong>"</p>
+      <% } %>
+      
+      <!-- Search Form -->
+      <form method="GET" action="/api-recipes/search" class="mb-4">
+        <div class="input-group input-group-lg">
+          <input type="text" name="q" class="form-control" placeholder="Search recipes..." value="<%= searchTerm || '' %>" required>
+          <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <% if(recipes && recipes.length > 0) { %>
+      <% recipes.forEach(function(recipe) { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <img src="<%= recipe.image %>" class="card-img-top" alt="<%= recipe.name %>" style="height: 250px; object-fit: cover;">
+            <div class="card-body">
+              <h5 class="card-title"><%= recipe.name %></h5>
+              <% if(recipe.category) { %>
+                <p class="text-muted"><i class="bi bi-tag"></i> <%= recipe.category %></p>
+              <% } %>
+              <% if(recipe.area) { %>
+                <p class="text-muted"><i class="bi bi-globe"></i> <%= recipe.area %></p>
+              <% } %>
+              <a href="/api-recipes/detail/<%= recipe.mealDBId %>" class="btn btn-primary">View Recipe</a>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="col-12">
+        <div class="alert alert-info text-center">
+          <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+          <h4>No recipes found</h4>
+          <p>Try searching with a different term or browse by category.</p>
+          <a href="/api-recipes" class="btn btn-primary">Browse All Recipes</a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+

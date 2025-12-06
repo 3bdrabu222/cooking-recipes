@@ -1,41 +1,149 @@
 <% if(recipe != null ) { %>
 
-  <nav aria-label="breadcrumb">
+<div class="container-xxl">
+  <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/">Home</a></li>
       <li class="breadcrumb-item active" aria-current="page"><%- recipe.name %></li>
     </ol>
   </nav>
 
+  <% if(typeof fromAPI !== 'undefined' && fromAPI) { %>
+    <div class="alert alert-info d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>This recipe is from TheMealDB API</strong>
+      </div>
+      <% if(recipe.youtube) { %>
+        <a href="<%= recipe.youtube %>" target="_blank" class="btn btn-danger btn-sm">
+          <i class="bi bi-youtube"></i> Watch on YouTube
+        </a>
+      <% } %>
+    </div>
+  <% } %>
 
-  <div class="row">
-
-    <div class="col-12 col-md-4">
-      <img src="/uploads/<%- recipe.image %>" class="img-fluid sticky-top" style="top: 20px;" alt="<%- recipe.name %>" loading="lazy">
+  <div class="row g-4">
+    <!-- Recipe Image -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-lg">
+        <img src="<%= typeof fromAPI !== 'undefined' && fromAPI ? recipe.image : '/uploads/' + recipe.image %>" 
+             class="card-img-top rounded-lg" 
+             alt="<%- recipe.name %>" 
+             style="height: 500px; object-fit: cover;">
+        
+        <% if(typeof fromAPI !== 'undefined' && fromAPI) { %>
+          <div class="card-body">
+            <% if(recipe.area || recipe.category || recipe.tags) { %>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <% if(recipe.area) { %>
+                  <span class="badge bg-primary">
+                    <i class="bi bi-globe"></i> <%= recipe.area %>
+                  </span>
+                <% } %>
+                <% if(recipe.category) { %>
+                  <span class="badge bg-secondary">
+                    <i class="bi bi-tag"></i> <%= recipe.category %>
+                  </span>
+                <% } %>
+                <% if(recipe.tags && recipe.tags.length > 0) { %>
+                  <% recipe.tags.forEach(function(tag) { %>
+                    <span class="badge bg-light text-dark"><%= tag.trim() %></span>
+                  <% }) %>
+                <% } %>
+              </div>
+            <% } %>
+            
+            <% if(recipe.source) { %>
+              <a href="<%= recipe.source %>" target="_blank" class="btn btn-outline w-100">
+                <i class="bi bi-link-45deg"></i> View Original Source
+              </a>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
     </div>
 
-    <div class="col-12 col-md-8">
-      <div class="row">
-        <div class="col-12"><h1><%- recipe.name %></h1></div>
-        <div class="col-12 mb-4"><i class="bi bi-tag"></i> <%- recipe.category %></div>
-        <div class="col-12" style="white-space: pre-line;">
-          <h4>Cooking Instructions</h4>
-          <%- recipe.description %>
-        </div>
-      </div>
+    <!-- Recipe Details -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-4">
+          <h1 class="display-5 mb-3"><%- recipe.name %></h1>
+          
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <% if(recipe.category) { %>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-tag-fill text-primary me-2"></i>
+                <span><%= recipe.category %></span>
+              </div>
+            <% } %>
+            <% if(recipe.area) { %>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-geo-alt-fill text-secondary me-2"></i>
+                <span><%= recipe.area %></span>
+              </div>
+            <% } %>
+          </div>
 
-      <div class="row pt-4">
-        <div class="col-12">
-          <h4>Ingredients</h4>
-          <ul class="list-group list-group-flush">
-            <% recipe.ingredients.forEach(function(ingredients, index){ %>
-              <li class="list-group-item"><%= ingredients %></li>
-            <% }) %>
-          </ul> 
+          <!-- Ingredients -->
+          <div class="mb-4">
+            <h3 class="mb-3">
+              <i class="bi bi-list-check text-primary"></i> Ingredients
+            </h3>
+            <div class="row g-2">
+              <% recipe.ingredients.forEach(function(ingredient, index){ %>
+                <div class="col-md-6">
+                  <div class="card bg-light border-0 p-3">
+                    <div class="d-flex align-items-center">
+                      <i class="bi bi-check-circle-fill text-success me-2"></i>
+                      <span><%= ingredient %></span>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <!-- Instructions -->
+          <div>
+            <h3 class="mb-3">
+              <i class="bi bi-book text-primary"></i> Cooking Instructions
+            </h3>
+            <div class="card bg-light border-0 p-4">
+              <div style="white-space: pre-line; line-height: 1.8; font-size: 1.05rem;">
+                <%- recipe.description %>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Related Recipes Section -->
+  <div class="row mt-5">
+    <div class="col-12">
+      <div class="section-title">
+        <h2>You Might Also Like</h2>
+        <p>Discover more amazing recipes</p>
+      </div>
+      <div class="text-center">
+        <a href="/api-recipes/random" class="btn btn-primary btn-lg me-3">
+          <i class="bi bi-shuffle"></i> Get Random Recipe
+        </a>
+        <a href="/api-recipes" class="btn btn-secondary btn-lg">
+          <i class="bi bi-search"></i> Browse More Recipes
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <% } else { %>
-  <p>No item found.</p>
+  <div class="container-xxl">
+    <div class="alert alert-danger text-center">
+      <h4><i class="bi bi-exclamation-triangle"></i> Recipe Not Found</h4>
+      <p>The recipe you're looking for doesn't exist.</p>
+      <a href="/" class="btn btn-primary">Go to Homepage</a>
+    </div>
+  </div>
 <% } %>

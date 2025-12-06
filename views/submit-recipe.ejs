@@ -1,11 +1,24 @@
-<div class="px-4 py-5 my-5 text-center">
-  <h1 class="display-5 fw-bold">Submit Your Recipe</h1>
-  <div class="col-lg-6 mx-auto">
-    <p class="lead">Share your amazing recipies with thousands of web developers accross the world. Fill our form to get started.</p>
+<div class="container-xxl">
+  <div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold">Submit Your Recipe</h1>
+    <div class="col-lg-6 mx-auto">
+      <% if(typeof apiOnly !== 'undefined' && apiOnly) { %>
+        <div class="alert alert-info mb-4">
+          <h4><i class="bi bi-info-circle"></i> API Only Mode</h4>
+          <p class="lead">This website uses TheMealDB API to display recipes. Recipe submission is currently disabled.</p>
+          <p>You can browse thousands of recipes from TheMealDB API instead!</p>
+          <a href="/api-recipes" class="btn btn-primary btn-lg mt-3">
+            <i class="bi bi-cloud-arrow-down"></i> Browse API Recipes
+          </a>
+        </div>
+      <% } else { %>
+        <p class="lead">Share your amazing recipies with thousands of web developers accross the world. Fill our form to get started.</p>
+      <% } %>
+    </div>
   </div>
-</div>
 
-<div class="row justify-content-center">
+  <% if(typeof apiOnly === 'undefined' || !apiOnly) { %>
+  <div class="row justify-content-center">
 
   <% if(infoSubmitObj != '') { %>
     <div class="col-8 alert alert-success" role="alert">
@@ -80,4 +93,5 @@
     </form>
 
   </div>
+  <% } %>
 </div>

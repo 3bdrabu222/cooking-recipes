@@ -1,16 +1,17 @@
 const mongoose = require('mongoose');
 
-// MongoDB Atlas connection string
-const MONGODB_URI = 'mongodb+srv://alshrafi1999:EqbVU5U8PLOgE5gO@cluster1.pci4p.mongodb.net/recipe_blog?retryWrites=true&w=majority';
+// Local MongoDB connection string
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/recipe_blog';
 
 // Mongoose configuration
 mongoose.set('strictQuery', false);
 
-// Connect to MongoDB Atlas
+// Connect to local MongoDB
 mongoose.connect(MONGODB_URI).then(() => {
-  console.log('Connected to MongoDB Atlas successfully');
+  console.log('Connected to local MongoDB successfully');
 }).catch((err) => {
-  console.error('MongoDB Atlas connection error:', err.message);
+  console.error('Local MongoDB connection error:', err.message);
+  console.error('Make sure MongoDB is running on localhost:27017');
   process.exit(1); // Exit if we can't connect to the database
 });
 
@@ -32,12 +33,12 @@ db.on('reconnected', () => {
 
 db.once('open', async function(){
   console.log('Database connection successful');
-  
-  try {
-    await insertDummyData();
-  } catch(error) {
-    console.error('Error inserting dummy data:', error.message);
-  }
+  // Dummy data insertion disabled - using TheMealDB API instead
+  // try {
+  //   await insertDummyData();
+  // } catch(error) {
+  //   console.error('Error inserting dummy data:', error.message);
+  // }
 });
 
 // Models
